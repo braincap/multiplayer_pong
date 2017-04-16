@@ -19,11 +19,15 @@ io.on('connection', function (socket) {
   console.log("Own id : " + ownId);
   console.log("Friend id : " + friendId);
 
-  socket.on('redUpPressed', function (msg) {
+  socket.on('greenUpPressed', function (msg) {
+    console.log(ownId + ' says green up pressed');
+    io.to(ownId).emit('greenUpPressed', msg);
     io.to(friendId).emit('redUpPressed', msg);
   });
 
-  socket.on('redDownPressed', function (msg) {
+  socket.on('greenDownPressed', function (msg) {
+    console.log(ownId + ' says green down pressed');
+    io.to(ownId).emit('greenDownPressed', msg);
     io.to(friendId).emit('redDownPressed', msg);
   });
 

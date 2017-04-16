@@ -1,5 +1,5 @@
 // Socket handling
-var socket = io();
+var socket = io.connect({ 'forceNew': true });
 
 // Send partner's ID
 var partnerId = prompt("Enter your friend's ID");
@@ -49,35 +49,43 @@ var ballColor = "#0095DD"
 
 window.addEventListener('keydown', keyDownHandler, false);
 window.addEventListener('keyup', keUpHandler, false);
-socket.on('redUpPressed', function (msg) {
-  redUpPressed = msg;
-  console.log("Friend's press received redUpPressed : " + redUpPressed);
-});
-socket.on('redDownPressed', function (msg) {
-  redDownPressed = msg;
-  console.log("Friend's press received : " + redDownPressed);
-});
-
 
 function keyDownHandler(e) {
   if (e.keyCode == 40) {
-    greenUpPressed = true;
-    socket.emit('redDownPressed', true);
+    socket.emit('greenUpPressed', true);
   } else if (e.keyCode == 38) {
-    greenDownPressed = true;
-    socket.emit('redUpPressed', true);
+    socket.emit('greenDownPressed', true);
   }
 }
 
 function keUpHandler(e) {
   if (e.keyCode == 40) {
-    greenUpPressed = false;
-    socket.emit('redDownPressed', false);
+    socket.emit('greenUpPressed', false);
   } else if (e.keyCode == 38) {
-    greenDownPressed = false;
-    socket.emit('redUpPressed', false);
+    socket.emit('greenDownPressed', false);
   }
 }
+
+socket.on('greenUpPressed', function (msg) {
+  greenUpPressed = msg;
+  console.log("Own press received greenUpPressed : " + greenUpPressed);
+});
+
+socket.on('greenDownPressed', function (msg) {
+  greenDownPressed = msg;
+  console.log("Own press received greenDownPressed: " + greenDownPressed);
+});
+
+socket.on('redUpPressed', function (msg) {
+  redUpPressed = msg;
+  console.log("Friend's press received redUpPressed : " + redUpPressed);
+});
+
+socket.on('redDownPressed', function (msg) {
+  redDownPressed = msg;
+  console.log("Friend's press received redDownPressed: " + redDownPressed);
+});
+
 
 function drawPaddleA() {
   c.beginPath();
