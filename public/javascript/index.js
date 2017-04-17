@@ -2,46 +2,43 @@
 var socket = io.connect({ 'forceNew': true });
 
 // Send partner's ID
-var partnerId = prompt("Enter your friend's ID");
+socket.on('connect', () => console.log('http://localhost:5000/' + socket.io.engine.id));
 
-var request = new XMLHttpRequest();
-request.open('GET', '/' + partnerId, true);
-request.onload = function () {
-  if (request.status >= 200 && request.status < 400) {
-    console.log("Friend ID sent");
-    var resp = request.responseText;
-  } else {
-    console.log("Server connected but error returned");
-  }
-};
+// socket.emit("partnerId received", partnerId);
 
-request.onerror = function () {
-  console.log("Error while connecting to server");
-};
+//Update player counter
 
-request.send();
+socket.on('count', function (msg) {
+  console.log('Count received', msg);
+  document.getElementById('player').innerHTML = msg.cnt;
+});
 
 // Canvas and rest of the game
+
 
 var canvas = document.getElementById('myCanvas');
 var c = canvas.getContext('2d');
 
-var paddleWidth = 15;
-var paddleHeight = 90;
-var paddleAX = 0;
-var paddleAY = (canvas.height - paddleHeight) / 2;
-var paddleBX = (canvas.width - paddleWidth);
-var paddleBY = (canvas.height - paddleHeight) / 2;
-var greenUpPressed = false;
-var greenDownPressed = false;
-var redUpPressed = false;
-var redDownPressed = false;
+function init() {
+  playing = false;
+  paddleWidth = 15;
+  paddleHeight = 90;
+  paddleAX = 0;
+  paddleAY = (canvas.height - paddleHeight) / 2;
+  paddleBX = (canvas.width - paddleWidth);
+  paddleBY = (canvas.height - paddleHeight) / 2;
+  greenUpPressed = false;
+  greenDownPressed = false;
+  redUpPressed = false;
+  redDownPressed = false;
+  ballX = canvas.width / 2;
+  ballY = canvas.height / 2;
+  dx = 2;
+  dy = 2;
+  ballRadius = 10;
+}
 
-var ballX = canvas.width / 2;
-var ballY = canvas.height / 2;
-var dx = 5;
-var dy = 5;
-var ballRadius = 10;
+init();
 
 var redColor = "#FF1744"
 var greenColor = "#00BFA5"
@@ -55,6 +52,8 @@ function keyDownHandler(e) {
     socket.emit('greenUpPressed', true);
   } else if (e.keyCode == 40) {
     socket.emit('greenDownPressed', true);
+  } else if (e.keyCode == 32) {
+    playing = true;
   }
 }
 
@@ -63,6 +62,8 @@ function keUpHandler(e) {
     socket.emit('greenUpPressed', false);
   } else if (e.keyCode == 40) {
     socket.emit('greenDownPressed', false);
+  } else if (e.keyCode == 32) {
+    playing = true;
   }
 }
 
@@ -143,8 +144,9 @@ function draw() {
     paddleBY += 7;
   }
 
-
-  requestAnimationFrame(draw);
+  if (playing) {
+    requestAnimationFrame(draw);
+  }
 }
 
 function bounceCheck() {
@@ -159,10 +161,18 @@ function bounceCheck() {
   } else if (ballX - ballRadius <= paddleWidth && ballX + ballRadius >= 0 && ballY + ballRadius >= paddleAY && ballY - ballRadius <= paddleAY + paddleHeight) {
     dy = -dy;
   } else if (ballX + dx + ballRadius >= canvas.width) {
-    // window.location.reload();
+    playing = false;
+    init();
   } else if (ballX + dx - ballRadius <= 0) {
-    // window.location.reload();
+    playing = false;
+    init();
   }
 }
+
+socket.on('play', function (msg) {
+  console.log("Play received");
+  playing = true;
+  draw();
+});
 
 draw();
