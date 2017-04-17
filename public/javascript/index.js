@@ -51,17 +51,17 @@ window.addEventListener('keydown', keyDownHandler, false);
 window.addEventListener('keyup', keUpHandler, false);
 
 function keyDownHandler(e) {
-  if (e.keyCode == 40) {
+  if (e.keyCode == 38) {
     socket.emit('greenUpPressed', true);
-  } else if (e.keyCode == 38) {
+  } else if (e.keyCode == 40) {
     socket.emit('greenDownPressed', true);
   }
 }
 
 function keUpHandler(e) {
-  if (e.keyCode == 40) {
+  if (e.keyCode == 38) {
     socket.emit('greenUpPressed', false);
-  } else if (e.keyCode == 38) {
+  } else if (e.keyCode == 40) {
     socket.emit('greenDownPressed', false);
   }
 }
@@ -132,15 +132,15 @@ function draw() {
   ballY = ballY + dy;
   //Left paddle USER
   if (greenUpPressed) {
-    paddleAY += 7;
-  } else if (greenDownPressed) {
     paddleAY -= 7;
+  } else if (greenDownPressed) {
+    paddleAY += 7;
   }
   //Right paddle SOCKET
   if (redUpPressed) {
-    paddleBY += 7;
-  } else if (redDownPressed) {
     paddleBY -= 7;
+  } else if (redDownPressed) {
+    paddleBY += 7;
   }
 
 

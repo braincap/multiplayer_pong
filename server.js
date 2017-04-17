@@ -3,31 +3,31 @@ var path = require('path');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var ownId, friendId;
+var friendId;
+var friendIdHolder = {};
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/:userInput', (req, res) => {
   friendId = req.params.userInput;
-  console.log("Friend ID received and stored : " + friendId);
+  console.log("Friend ID received and stored : " + friendIdHolder);
 });
 
 io.on('connection', function (socket) {
+  friendIdHolder[socket.id] = friendId;
   console.log('a user connected');
-  ownId = socket.id;
-
-  console.log("Own id : " + ownId);
+  console.log("Own id : " + socket.id);
   console.log("Friend id : " + friendId);
 
   socket.on('greenUpPressed', function (msg) {
-    console.log(ownId + ' says green up pressed');
-    io.to(ownId).emit('greenUpPressed', msg);
+    console.log(socket.id + ' says green up pressed');
+    io.to(socket.id).emit('greenUpPressed', msg);
     io.to(friendId).emit('redUpPressed', msg);
   });
 
   socket.on('greenDownPressed', function (msg) {
-    console.log(ownId + ' says green down pressed');
-    io.to(ownId).emit('greenDownPressed', msg);
+    console.log(socket.id + ' says green down pressed');
+    io.to(socket.id).emit('greenDownPressed', msg);
     io.to(friendId).emit('redDownPressed', msg);
   });
 
