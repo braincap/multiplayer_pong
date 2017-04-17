@@ -24,3 +24,10 @@ canvas {
   left: 200px;
   z-index: 10;
 }
+
+#partner-id {
+  position: absolute;
+  bottom: 50px;
+  left: 200px;
+  z-index: 10;
+}

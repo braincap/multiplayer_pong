@@ -1,8 +1,10 @@
 // Socket handling
 var socket = io.connect({ 'forceNew': true });
+var a = document.getElementById('partner-id');
+a.style.visibility = "hidden";
 
 // Send partner's ID
-socket.on('connect', () => console.log('http://localhost:5000/' + socket.io.engine.id));
+
 
 // socket.emit("partnerId received", partnerId);
 
@@ -11,6 +13,11 @@ socket.on('connect', () => console.log('http://localhost:5000/' + socket.io.engi
 socket.on('count', function (msg) {
   console.log('Count received', msg);
   document.getElementById('player').innerHTML = msg.cnt;
+  if (msg.cnt == 1) {
+    console.log('http://localhost:5000/' + socket.io.engine.id);
+    a.href = 'http://localhost:5000/' + socket.io.engine.id;
+    a.style.visibility = "visible";
+  }
 });
 
 // Canvas and rest of the game
@@ -18,9 +25,9 @@ socket.on('count', function (msg) {
 
 var canvas = document.getElementById('myCanvas');
 var c = canvas.getContext('2d');
+var playing = false;
 
 function init() {
-  playing = false;
   paddleWidth = 15;
   paddleHeight = 90;
   paddleAX = 0;
@@ -161,10 +168,8 @@ function bounceCheck() {
   } else if (ballX - ballRadius <= paddleWidth && ballX + ballRadius >= 0 && ballY + ballRadius >= paddleAY && ballY - ballRadius <= paddleAY + paddleHeight) {
     dy = -dy;
   } else if (ballX + dx + ballRadius >= canvas.width) {
-    playing = false;
     init();
   } else if (ballX + dx - ballRadius <= 0) {
-    playing = false;
     init();
   }
 }
@@ -174,5 +179,3 @@ socket.on('play', function (msg) {
   playing = true;
   draw();
 });
-
-draw();
